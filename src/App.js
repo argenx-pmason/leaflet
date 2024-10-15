@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import geojsonFeature from "./geojsonFeature.json";
+import skills from "./skills matrix.json";
 
 function App() {
   const [position, setPosition] = useState([51.05361111, 3.72527778]),
@@ -36,13 +37,16 @@ function App() {
         dashArray: "3",
         fillOpacity: 0.7,
       };
-    };
-  // TODO: add geojson to add chloropleth map
-  // https://fmuchembi.medium.com/let-us-build-a-choropleth-map-using-react-leaflet-together-3245d30ac900
+    },
+    [people, setPeople] = useState([]);
 
   useEffect(() => {
     // L.geoJSON(geojsonFeature).addTo(map);
+    const people = skills.filter((p) => p.Lat_Long > " ");
+    console.log(people);
+    setPeople(people);
   }, []);
+
   return (
     // <div className="App">
     <Box>
@@ -56,11 +60,11 @@ function App() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <GeoJSON
+        {/* <GeoJSON
           attribution="&copy; credits due..."
           data={geojsonFeature}
           style={style}
-        />
+        /> */}
         <Marker
           position={argenx}
           icon={
@@ -71,10 +75,30 @@ function App() {
             })
           }
         >
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
+          <Popup>argenx head office</Popup>
         </Marker>
+        {people
+          ? people.map((person, id) => {
+              const split = person.Lat_Long.split(","),
+                ll = "[" + split[0] + "," + split[1] + "]";
+              console.log(person.Name, ll);
+              return (
+                <Marker
+                  key={id}
+                  position={JSON.parse(ll)}
+                  icon={
+                    new Icon({
+                      iconUrl: markerIconPng,
+                      iconSize: [10, 20],
+                      iconAnchor: [12, 41],
+                    })
+                  }
+                >
+                  <Popup>{person.Name}</Popup>
+                </Marker>
+              );
+            })
+          : null}
       </MapContainer>
     </Box>
     // </div>
